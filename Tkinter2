@@ -1,0 +1,106 @@
+import tkinter as tk
+from tkinter import ttk
+from tkinter import messagebox
+from datetime import datetime
+
+class SistemaGerenciamentoExpedicaoEspacial:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Sistema de Gerenciamento de Expedição Espacial")
+
+        self.missoes = []
+
+        self.criar_widgets()
+
+    def criar_widgets(self):
+        self.tab_control = ttk.Notebook(self.root)
+        self.tab_criar = ttk.Frame(self.tab_control)
+        self.tab_ler = ttk.Frame(self.tab_control)
+        self.tab_atualizar = ttk.Frame(self.tab_control)
+        self.tab_deletar = ttk.Frame(self.tab_control)
+
+        self.tab_control.add(self.tab_criar, text="Criar")
+        self.tab_control.add(self.tab_ler, text="Ler")
+        self.tab_control.add(self.tab_atualizar, text="Atualizar")
+        self.tab_control.add(self.tab_deletar, text="Deletar")
+        self.tab_control.pack(expand=1, fill="both")
+
+        # Aba Criar
+        self.frame_criar = tk.Frame(self.tab_criar)
+        self.frame_criar.pack(padx=20, pady=20)
+
+        self.lbl_nome = tk.Label(self.frame_criar, text="Nome da Missão:")
+        self.lbl_nome.grid(row=0, column=0, padx=5, pady=5, sticky="e")
+        self.entry_nome = tk.Entry(self.frame_criar)
+        self.entry_nome.grid(row=0, column=1, padx=5, pady=5)
+
+        self.lbl_data_lancamento = tk.Label(self.frame_criar, text="Data de Lançamento (AAAA-MM-DD):")
+        self.lbl_data_lancamento.grid(row=1, column=0, padx=5, pady=5, sticky="e")
+        self.entry_data_lancamento = tk.Entry(self.frame_criar)
+        self.entry_data_lancamento.grid(row=1, column=1, padx=5, pady=5)
+
+        self.lbl_destino = tk.Label(self.frame_criar, text="Destino:")
+        self.lbl_destino.grid(row=2, column=0, padx=5, pady=5, sticky="e")
+        self.entry_destino = tk.Entry(self.frame_criar)
+        self.entry_destino.grid(row=2, column=1, padx=5, pady=5)
+
+        self.lbl_tripulacao = tk.Label(self.frame_criar, text="Tripulação:")
+        self.lbl_tripulacao.grid(row=3, column=0, padx=5, pady=5, sticky="e")
+        self.entry_tripulacao = tk.Entry(self.frame_criar)
+        self.entry_tripulacao.grid(row=3, column=1, padx=5, pady=5)
+
+        self.lbl_carga_util = tk.Label(self.frame_criar, text="Carga Útil:")
+        self.lbl_carga_util.grid(row=4, column=0, padx=5, pady=5, sticky="e")
+        self.entry_carga_util = tk.Entry(self.frame_criar)
+        self.entry_carga_util.grid(row=4, column=1, padx=5, pady=5)
+
+        self.btn_adicionar_missao = tk.Button(self.frame_criar, text="Adicionar Missão", command=self.adicionar_missao)
+        self.btn_adicionar_missao.grid(row=5, column=0, columnspan=2, padx=5, pady=10)
+
+        # Aba Ler
+        self.frame_ler = tk.Frame(self.tab_ler)
+        self.frame_ler.pack(padx=20, pady=20)
+
+        self.tree_missao = ttk.Treeview(self.frame_ler, columns=("ID", "Nome", "Data de Lançamento", "Destino"))
+        self.tree_missao.heading("#0", text="ID")
+        self.tree_missao.heading("ID", text="ID")
+        self.tree_missao.heading("Nome", text="Nome")
+        self.tree_missao.heading("Data de Lançamento", text="Data de Lançamento")
+        self.tree_missao.heading("Destino", text="Destino")
+        self.tree_missao.pack()
+
+    def adicionar_missao(self):
+        nome = self.entry_nome.get()
+        data_lancamento_str = self.entry_data_lancamento.get()
+        destino = self.entry_destino.get()
+        tripulacao = self.entry_tripulacao.get()
+        carga_util = self.entry_carga_util.get()
+
+        try:
+            data_lancamento = datetime.strptime(data_lancamento_str, "%Y-%m-%d")
+        except ValueError:
+            messagebox.showerror("Erro", "Formato de data inválido. Use AAAA-MM-DD.")
+            return
+
+        missao = {
+            "ID": len(self.missoes) + 1,
+            "Nome": nome,
+            "Data de Lançamento": data_lancamento,
+            "Destino": destino,
+            "Tripulação": tripulacao,
+            "Carga Útil": carga_util
+        }
+
+        self.missoes.append(missao)
+        self.atualizar_arvore_missao()
+
+        messagebox.showinfo("Sucesso", "Missão adicionada com sucesso.")
+
+    def atualizar_arvore_missao(self):
+        self.tree_missao.delete(*self.tree_missao.get_children())
+        for missao in self.missoes:
+            self.tree_missao.insert("", "end", text=missao["ID"], values=(missao["ID"], missao["Nome"], missao["Data de Lançamento"], missao["Destino"]))
+
+root = tk.Tk()
+app = SistemaGerenciamentoExpedicaoEspacial(root)
+root.mainloop()
