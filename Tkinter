@@ -1,0 +1,110 @@
+import tkinter as tk
+from tkinter import ttk
+from tkinter import messagebox
+from datetime import datetime
+
+class SpaceMissionManagementSystem:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Sistema de Gerenciamento de Expedição Espacial")
+
+        self.missions = []
+
+        self.create_widgets()
+
+    def create_widgets(self):
+        self.tab_control = ttk.Notebook(self.root)
+        self.tab_create = ttk.Frame(self.tab_control)
+        self.tab_read = ttk.Frame(self.tab_control)
+        self.tab_update = ttk.Frame(self.tab_control)
+        self.tab_delete = ttk.Frame(self.tab_control)
+
+        self.tab_control.add(self.tab_create, text="Criar")
+        self.tab_control.add(self.tab_read, text="Ler")
+        self.tab_control.add(self.tab_update, text="Atualizar")
+        self.tab_control.add(self.tab_delete, text="Deletar")
+        self.tab_control.pack(expand=1, fill="both")
+
+        # Create tab
+        self.create_frame = tk.Frame(self.tab_create)
+        self.create_frame.pack(padx=20, pady=20)
+
+        self.lbl_name = tk.Label(self.create_frame, text="Nome da Missão:")
+        self.lbl_name.grid(row=0, column=0, padx=5, pady=5, sticky="e")
+        self.entry_name = tk.Entry(self.create_frame)
+        self.entry_name.grid(row=0, column=1, padx=5, pady=5)
+
+        self.lbl_launch_date = tk.Label(self.create_frame, text="Data de Lançamento (YYYY-MM-DD):")
+        self.lbl_launch_date.grid(row=1, column=0, padx=5, pady=5, sticky="e")
+        self.entry_launch_date = tk.Entry(self.create_frame)
+        self.entry_launch_date.grid(row=1, column=1, padx=5, pady=5)
+
+        self.lbl_destination = tk.Label(self.create_frame, text="Destino:")
+        self.lbl_destination.grid(row=2, column=0, padx=5, pady=5, sticky="e")
+        self.entry_destination = tk.Entry(self.create_frame)
+        self.entry_destination.grid(row=2, column=1, padx=5, pady=5)
+
+        self.lbl_crew = tk.Label(self.create_frame, text="Tripulação:")
+        self.lbl_crew.grid(row=3, column=0, padx=5, pady=5, sticky="e")
+        self.entry_crew = tk.Entry(self.create_frame)
+        self.entry_crew.grid(row=3, column=1, padx=5, pady=5)
+
+        self.lbl_payload = tk.Label(self.create_frame, text="Carga Útil:")
+        self.lbl_payload.grid(row=4, column=0, padx=5, pady=5, sticky="e")
+        self.entry_payload = tk.Entry(self.create_frame)
+        self.entry_payload.grid(row=4, column=1, padx=5, pady=5)
+
+        self.btn_add_mission = tk.Button(self.create_frame, text="Adicionar Missão", command=self.add_mission)
+        self.btn_add_mission.grid(row=5, column=0, columnspan=2, padx=5, pady=10)
+
+        # Read tab
+        self.read_frame = tk.Frame(self.tab_read)
+        self.read_frame.pack(padx=20, pady=20)
+
+        self.mission_tree = ttk.Treeview(self.read_frame, columns=("ID", "Nome", "Data de Lançamento", "Destino"))
+        self.mission_tree.heading("#0", text="ID")
+        self.mission_tree.heading("ID", text="ID")
+        self.mission_tree.heading("Nome", text="Nome")
+        self.mission_tree.heading("Data de Lançamento", text="Data de Lançamento")
+        self.mission_tree.heading("Destino", text="Destino")
+        self.mission_tree.pack()
+
+        # Update tab
+
+        # Delete tab
+
+    def add_mission(self):
+        name = self.entry_name.get()
+        launch_date_str = self.entry_launch_date.get()
+        destination = self.entry_destination.get()
+        crew = self.entry_crew.get()
+        payload = self.entry_payload.get()
+
+        try:
+            launch_date = datetime.strptime(launch_date_str, "%Y-%m-%d")
+        except ValueError:
+            messagebox.showerror("Erro", "Formato de data inválido. Use YYYY-MM-DD.")
+            return
+
+        mission = {
+            "ID": len(self.missions) + 1,
+            "Nome": name,
+            "Data de Lançamento": launch_date,
+            "Destino": destination,
+            "Tripulação": crew,
+            "Carga Útil": payload
+        }
+
+        self.missions.append(mission)
+        self.update_mission_tree()
+
+        messagebox.showinfo("Sucesso", "Missão adicionada com sucesso.")
+
+    def update_mission_tree(self):
+        self.mission_tree.delete(*self.mission_tree.get_children())
+        for mission in self.missions:
+            self.mission_tree.insert("", "end", text=mission["ID"], values=(mission["ID"], mission["Nome"], mission["Data de Lançamento"], mission["Destino"]))
+
+root = tk.Tk()
+app = SpaceMissionManagementSystem(root)
+root.mainloop()
